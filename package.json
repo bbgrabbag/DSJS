@@ -1,0 +1,29 @@
+{
+  "name": "data-structures",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./lib/index.js",
+  "files": [
+    "/lib"
+  ],
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "test": "node --inspect-brk ./node_modules/jest/bin/jest",
+    "test:build": "tsc --project ./tsconfig.test.json",
+    "build": "tsc"
+  },
+  "author": "Ben Turner",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@types/node": "^14.0.11",
+    "jest": "^26.0.1",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {},
+  "jest": {
+    "testMatch": [
+      "**/?(*.)+(spec|test).js"
+    ]
+  }
+}
