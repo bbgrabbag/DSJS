@@ -16,7 +16,7 @@ npm t
 npm run build 
 ```
 ### Table of Contents
-- [Linked List](linked-list)
+- [Linked List](#linked-list)
 
 ### Linked List
 ```js
