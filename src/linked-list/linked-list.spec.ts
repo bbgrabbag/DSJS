@@ -11,19 +11,27 @@ describe('Linked list nodes', () => {
         node.value = 5;
         expect(node.value).toBe(5);
     });
-    it('Should insert nodes correctly', () => {
+    it('Should create nodes correctly', () => {
         const node = new LinkedListNode<number>(1);
         node.next = new LinkedListNode<number>(3);
         expect(node.value).toBe(1);
-        expect(node.next.value).toBe(3);
+        expect(node.next?.value).toBe(3);
 
         node.next = new LinkedListNode<number>(2);
-        expect(node.next.value).toBe(2);
-        expect(node.next?.next?.value).toBe(3);
+        expect(node.next?.value).toBe(2);
+        expect(node.next?.next).toBe(null);
 
         node.next = null;
         expect(node.next).toBeNull();
 
+    });
+    it('Should insert nodes correctly', () => {
+        const node = new LinkedListNode<number>(1);
+        node.insert(2);
+        expect(node.next?.value).toBe(2);
+        node.insert(1.5);
+        expect(node.next?.value).toBe(1.5);
+        expect(node.next?.next?.value).toBe(2);
     });
 });
 
@@ -47,6 +55,7 @@ describe('Linked list', () => {
         expect(ll.head?.value).toBe(5);
         expect(ll.head?.next?.value).toBe(3);
         expect(ll.head?.next?.next).toBeNull();
+        expect([...ll].length).toBe(2);
     });
 
     it('Should initialize with array of values', () => {
@@ -59,8 +68,18 @@ describe('Linked list', () => {
     });
 
     it('Should iterate over node values in list', () => {
-        const ll = new LinkedList<number>([1, 2, 3, 4, 5]);
-        expect([...ll]).toEqual([1, 2, 3, 4, 5]);
+        const ll = new LinkedList<{ key: string }>([
+            { key: 'test' },
+            { key: 'test1' },
+            { key: 'test2' },
+            { key: 'test3' },
+        ]);
+        expect([...ll]).toEqual([
+            { key: 'test' },
+            { key: 'test1' },
+            { key: 'test2' },
+            { key: 'test3' },
+        ]);
     });
     it('Should append nodes to the list', () => {
         const ll = new LinkedList<number>();
@@ -87,7 +106,7 @@ describe('Linked list', () => {
         ll.remove(ll.head?.next as LinkedListNode<number>);
         expect(ll.head?.next?.value).toBe(4);
         expect(ll.head?.value).toBe(2);
-
+        expect([...ll].length).toBe(2);
     });
     it('Should find a node from the list', () => {
         const ll = new LinkedList<number>([1, 2, 3, 4]);
@@ -95,5 +114,14 @@ describe('Linked list', () => {
         expect(node).toEqual(ll.head?.next?.next);
         const nothing = ll.find(n => n.value === 10);
         expect(nothing).toBeUndefined();
+    });
+
+    it('Should loop through the list', () => {
+        const ll = new LinkedList<number>([1, 2, 3, 4]);
+        let x = 1;
+        ll.forEach(node => {
+            expect(node.value).toBe(x);
+            x++;
+        });
     });
 });

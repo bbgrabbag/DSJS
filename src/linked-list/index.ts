@@ -15,17 +15,23 @@ export class LinkedListNode<D> {
     }
 
     set next(node: LinkedListNode<D> | null) {
-        if (this.next !== null) {
-            if (node !== null) {
-                const tmp: LinkedListNode<D> = this.next;
-                node.next = tmp;
-            }
-        }
         this._next = node;
     }
 
     get next(): LinkedListNode<D> | null {
         return this._next;
+    }
+    insert(value: D): LinkedListNode<D>
+    insert(node: LinkedListNode<D>): LinkedListNode<D>
+    insert(arg: D | LinkedListNode<D>): LinkedListNode<D> {
+        const node = arg instanceof LinkedListNode ? arg : new LinkedListNode<D>(arg);
+        if (this.next === null) {
+            return this.next = node;
+        } else {
+            const tmp = this.next;
+            node.next = tmp;
+            return this.next = node;
+        }
     }
 }
 
@@ -91,11 +97,12 @@ export class LinkedList<D> {
         }
     }
 
-    remove(node: LinkedListNode<D>): void {
-        if (this.head === null) return;
+    remove(node: LinkedListNode<D>): LinkedListNode<D> | null {
+        if (this.head === null) return null;
         if (node === this.head) {
-            this.head = this.head.next;
-            return;
+            const tmp = this.head;
+            this.head = null;
+            return this.head = tmp.next;
         }
 
         let next = this.head.next;
@@ -103,11 +110,21 @@ export class LinkedList<D> {
 
         while (next !== null) {
             if (node === next) {
-                prev.next = next.next;
+                const tmp = next;
                 next = null;
-                return;
+                return prev.next = tmp.next;
             }
             prev = next;
+            next = next.next;
+        }
+
+        return null;
+    }
+
+    forEach(cb: (node: LinkedListNode<D>) => void): void {
+        let next = this.head;
+        while (next !== null) {
+            cb(next);
             next = next.next;
         }
     }
