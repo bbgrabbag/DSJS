@@ -42,7 +42,7 @@ export class LinkedList<D> {
     constructor(empty?: null)
     constructor(head?: LinkedListNode<D>)
     constructor(values?: D[])
-    constructor(initializer?: D | D[] | LinkedListNode<D>) {
+    constructor(initializer?: D | D[] | LinkedListNode<D> | null) {
         if (initializer === undefined || initializer === null) return;
         if (Array.isArray(initializer)) {
             if (!initializer.length) return;
