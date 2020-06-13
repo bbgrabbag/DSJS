@@ -10,7 +10,7 @@
   "scripts": {
     "eslint": "eslint",
     "test": "node --inspect-brk ./node_modules/jest/bin/jest",
-    "test:build": "tsc --project ./tsconfig.test.json",
+    "test:watch": "tsc --project ./tsconfig.test.json",
     "build": "tsc"
   },
   "author": "Ben Turner",

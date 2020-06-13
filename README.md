@@ -7,7 +7,7 @@ JS Library of common data structures inspired by Cracking the Code
 npm i dsjs
 
 #Watch for changes
-npm run test:build 
+npm run test:watch 
 
 #Run tests
 npm t 
