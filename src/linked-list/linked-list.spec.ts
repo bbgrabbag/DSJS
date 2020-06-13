@@ -41,6 +41,11 @@ describe('Linked list', () => {
         expect(ll.constructor.name).toBe('LinkedList');
         expect(ll.head).toBeNull();
     });
+    it('Should initialize with null', () => {
+        const ll = new LinkedList<number>(null);
+        expect(ll.constructor.name).toBe('LinkedList');
+        expect(ll.head).toBeNull();
+    });
 
     it('Should initialize with single value', () => {
         const ll = new LinkedList<number>(5);

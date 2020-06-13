@@ -39,10 +39,11 @@ export class LinkedList<D> {
     private _head: LinkedListNode<D> | null = null
 
     constructor(headValue?: D)
+    constructor(empty?: null)
     constructor(head?: LinkedListNode<D>)
     constructor(values?: D[])
     constructor(initializer?: D | D[] | LinkedListNode<D>) {
-        if (initializer === undefined) return;
+        if (initializer === undefined || initializer === null) return;
         if (Array.isArray(initializer)) {
             if (!initializer.length) return;
             this._head = new LinkedListNode<D>(initializer.shift() as D);
