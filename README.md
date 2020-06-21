@@ -21,6 +21,7 @@ npm run build
 ### Table of Contents
 - [Linked List](#linked-list)
 - [Stack](#stack)
+- [Queue](#queue)
 
 ### Linked List
 ```js
@@ -30,4 +31,9 @@ import {LinkedList, LinkedListNode} from 'dsjs'
 ### Stack
 ```js
 import {Stack} from 'dsjs'
+```
+
+### Queue
+```js
+import {Queue} from 'dsjs'
 ```
