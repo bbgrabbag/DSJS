@@ -1,6 +1,6 @@
 import { Stack, ArrayStack, IntStack } from '.';
 
-xdescribe('Stacks', () => {
+describe('Stacks', () => {
     it('Should initialize as empty', () => {
         const stack = new Stack<void>();
         expect(stack.length).toBe(0);
@@ -31,7 +31,7 @@ xdescribe('Stacks', () => {
     });
 });
 
-xdescribe('Array Stacks', () => {
+describe('Array Stacks', () => {
     it('Should initialize as empty with default or specified size', () => {
         const stack = new ArrayStack();
         expect(stack.peek()).toBe(null);
