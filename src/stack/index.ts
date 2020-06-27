@@ -21,15 +21,17 @@ class StackNode<D>{
 export class Stack<D>{
 
     private top: StackNode<D> | null = null;
+    private _length = 0;
 
-    public get isEmpty(): boolean {
-        return this.top === null;
+    public get length(): number {
+        return this._length;
     }
 
-    public pop(): D | null {
-        if (this.top === null) return null;
+    public pop(): D {
+        if (this.top === null) throw Error('Cannot remove from empty stack');
         const output = this.top.data;
         this.top = this.top.next;
+        this._length--;
         return output;
     }
 
@@ -37,6 +39,7 @@ export class Stack<D>{
         const node = new StackNode<D>(data);
         node.next = this.top;
         this.top = node;
+        this._length++;
     }
 
     public peek(): D | null {
@@ -70,7 +73,7 @@ export class ArrayStack<D>{
         return this.stack[this.index] = data;
     }
 
-    public pop(): D | null {
+    public pop(): D {
         if (this.index === -1) throw Error('Cannnot remove from empty stack');
         const output = this.stack[this.index];
         delete this.stack[this.index];
@@ -81,5 +84,30 @@ export class ArrayStack<D>{
     public peek(): D | null {
         if (this.length === 0) return null;
         return this.stack[this.index];
+    }
+}
+
+export class IntStack extends Stack<number>{
+    private _min = new Stack<number>();
+
+    constructor() {
+        super();
+    }
+
+    get min(): number | null {
+        return this._min.peek();
+    }
+
+    public push(x: number): void {
+        super.push(x);
+        if (this.min === null) return this._min.push(x);
+        if (x < this.min) this._min.push(x);
+        else this._min.push(this.min);
+    }
+
+    public pop(): number {
+        const output = super.pop();
+        this._min.pop();
+        return output;
     }
 }
