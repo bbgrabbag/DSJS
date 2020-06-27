@@ -101,13 +101,12 @@ export class IntStack extends Stack<number>{
     public push(x: number): void {
         super.push(x);
         if (this.min === null) return this._min.push(x);
-        if (x < this.min) this._min.push(x);
-        else this._min.push(this.min);
+        if (x <= this.min) this._min.push(x);
     }
 
     public pop(): number {
         const output = super.pop();
-        this._min.pop();
+        if (output === this.min) this._min.pop();
         return output;
     }
 }

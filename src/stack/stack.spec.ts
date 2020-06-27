@@ -96,26 +96,19 @@ describe('Int Stack', () => {
 
     it('Should remove items and update min', () => {
         const stack = new IntStack();
-        const ints = [4, 2, 5, 9, -1, 2];
+        const ints = Array.from(Array(100)).map(() => Math.floor(Math.random() * 500));
         ints.forEach((x, i) => {
             stack.push(x);
-            if (i === 0) expect(stack.min).toBe(4);
-            if (i === 1) expect(stack.min).toBe(2);
-            if (i === 2) expect(stack.min).toBe(2);
-            if (i === 3) expect(stack.min).toBe(2);
-            if (i === 4) expect(stack.min).toBe(-1);
-            if (i === 5) expect(stack.min).toBe(-1);
+            const min = Math.min(...ints.slice(0, i + 1));
+            expect(stack.min).toBe(min);
+            expect(stack.peek()).toBe(ints[i]);
         });
         expect(stack.length).toBe(ints.length);
 
         ints.forEach((x, i) => {
-            if (i === 0) expect(stack.min).toBe(-1);
-            if (i === 1) expect(stack.min).toBe(-1);
-            if (i === 2) expect(stack.min).toBe(2);
-            if (i === 3) expect(stack.min).toBe(2);
-            if (i === 4) expect(stack.min).toBe(2);
-            if (i === 5) expect(stack.min).toBe(4);
-            stack.pop();
+            const min = Math.min(...ints.slice(0, ints.length - i));
+            expect(stack.min).toBe(min);
+            expect(stack.pop()).toBe(ints[ints.length - i - 1]);
         });
 
         expect(stack.length).toBe(0);
