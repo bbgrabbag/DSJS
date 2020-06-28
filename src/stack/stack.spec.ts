@@ -1,4 +1,4 @@
-import { Stack, ArrayStack, IntStack } from '.';
+import { Stack, ArrayStack, IntStack, StackSet } from '.';
 
 describe('Stacks', () => {
     it('Should initialize as empty', () => {
@@ -62,7 +62,7 @@ describe('Array Stacks', () => {
         expect(stack.pop()).toBe(1);
         expect(stack.size).toBe(3);
         expect(stack.length).toBe(0);
-        expect(() => stack.pop()).toThrowError('Cannnot remove from empty stack');
+        expect(() => stack.pop()).toThrowError('Cannot remove from empty stack');
     });
 });
 
@@ -115,6 +115,39 @@ describe('Int Stack', () => {
         expect(stack.min).toBe(null);
         expect(stack.peek()).toBe(null);
 
+        expect(() => stack.pop()).toThrowError('Cannot remove from empty stack');
+
+    });
+});
+
+describe('Stack Set', () => {
+    it('Should initialize empty', () => {
+        const stack = new StackSet<number>();
+        expect(stack.length).toBe(0);
+        expect(stack.size).toBe(256);
+    });
+    it('Should add new items', () => {
+        const stack = new StackSet<number>(3);
+        expect(stack.size).toBe(3);
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        expect(stack.length).toBe(3);
+        stack.push(4);
+        expect(stack.length).toBe(4);
+    });
+
+    it('Should remove items', () => {
+        const stack = new StackSet<number>(3);
+        let i = 0;
+        while (++i < 5) {
+            stack.push(i);
+        }
+        expect(stack.length).toBe(4);
+        while (--i > 0) {
+            expect(stack.pop()).toBe(i);
+        }
+        expect(stack.length).toBe(0);
         expect(() => stack.pop()).toThrowError('Cannot remove from empty stack');
 
     });

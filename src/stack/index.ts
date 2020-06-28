@@ -74,7 +74,7 @@ export class ArrayStack<D>{
     }
 
     public pop(): D {
-        if (this.index === -1) throw Error('Cannnot remove from empty stack');
+        if (this.index === -1) throw Error('Cannot remove from empty stack');
         const output = this.stack[this.index];
         delete this.stack[this.index];
         this.index--;
@@ -107,6 +107,46 @@ export class IntStack extends Stack<number>{
     public pop(): number {
         const output = super.pop();
         if (output === this.min) this._min.pop();
+        return output;
+    }
+}
+
+export class StackSet<D> {
+
+    private _size: number;
+    private _length = 0;
+    private _stacks = new Stack<Stack<D>>()
+
+    constructor(size = 256) {
+        this._size = size;
+    }
+
+    get length(): number {
+        return this._length;
+    }
+
+    get size(): number {
+        return this._size;
+    }
+
+    push(data: D): void {
+        const stack = this._stacks.peek();
+        if (stack === null || stack.length === this._size) {
+            const newStack = new Stack<D>();
+            newStack.push(data);
+            this._stacks.push(newStack);
+        } else {
+            stack.push(data);
+        }
+        this._length++;
+    }
+
+    pop(): D {
+        if (this.length === 0) throw Error('Cannot remove from empty stack');
+        const stack = this._stacks.peek() as Stack<D>;
+        const output = stack.pop();
+        if (stack.length === 0) this._stacks.pop();
+        this._length--;
         return output;
     }
 }
