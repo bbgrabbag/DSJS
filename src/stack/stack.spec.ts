@@ -1,6 +1,6 @@
-import { Stack, ArrayStack, IntStack, StackSet } from '.';
+import { Stack, ArrayStack, IntStack, StackSet, SortStack } from '.';
 
-describe('Stacks', () => {
+xdescribe('Stacks', () => {
     it('Should initialize as empty', () => {
         const stack = new Stack<void>();
         expect(stack.length).toBe(0);
@@ -31,7 +31,7 @@ describe('Stacks', () => {
     });
 });
 
-describe('Array Stacks', () => {
+xdescribe('Array Stacks', () => {
     it('Should initialize as empty with default or specified size', () => {
         const stack = new ArrayStack();
         expect(stack.peek()).toBe(null);
@@ -67,7 +67,7 @@ describe('Array Stacks', () => {
 });
 
 
-describe('Int Stack', () => {
+xdescribe('Int Stack', () => {
     it('Should initialize as null', () => {
         const stack = new IntStack();
         expect(stack.length).toBe(0);
@@ -120,7 +120,7 @@ describe('Int Stack', () => {
     });
 });
 
-describe('Stack Set', () => {
+xdescribe('Stack Set', () => {
     it('Should initialize empty', () => {
         const stack = new StackSet<number>();
         expect(stack.length).toBe(0);
@@ -150,5 +150,52 @@ describe('Stack Set', () => {
         expect(stack.length).toBe(0);
         expect(() => stack.pop()).toThrowError('Cannot remove from empty stack');
 
+    });
+});
+
+describe('Sort Stack', () => {
+    it('Should intialize as empty', () => {
+        const stack = new SortStack<number>();
+        expect(stack.length).toBe(0);
+        expect(stack.peek()).toBe(null);
+        expect(() => stack.pop()).toThrowError('Cannot remove from empty stack');
+    });
+
+    it('Should add items and order them', () => {
+        const stack = new SortStack<number>();
+        const ints = Array.from(Array(100)).map(() => Math.floor(Math.random()));
+
+        let i = 0;
+        while (i < ints.length) {
+            stack.push(ints[i]);
+            expect(stack.length).toBe(i + 1);
+            expect(stack.peek()).toBe(Math.min(...ints.slice(0, i + 1)));
+            i++;
+        }
+    });
+
+    it('Should remove the min item', () => {
+        const stack = new SortStack<number>();
+        const ints = Array.from(Array(100)).map(() => Math.floor(Math.random()));
+        const sorted = ints.sort((x, y) => x <= y ? -1 : 1);
+
+        ints.forEach(x => stack.push(x));
+        let i = 0;
+        while (i < ints.length) {
+            const value = stack.pop();
+            expect(value).toBe(sorted[i]);
+            expect(stack.length).toBe(ints.length - i - 1);
+            i++;
+        }
+    });
+
+    it('Should support custom sort', () => {
+        const stack = new SortStack<string>((x, y) => x > y ? -1 : 1);
+        stack.push('a');
+        expect(stack.peek()).toBe('a');
+        stack.push('c');
+        expect(stack.peek()).toBe('c');
+        stack.push('b');
+        expect(stack.peek()).toBe('c');
     });
 });

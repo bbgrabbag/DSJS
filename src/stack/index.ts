@@ -1,27 +1,17 @@
 class StackNode<D>{
-    private _data: D;
-    private _next: StackNode<D> | null = null;
+    public next: StackNode<D> | null = null;
+    public data: D;
+
     constructor(data: D) {
-        this._data = data;
+        this.data = data;
     }
 
-    public get data() {
-        return this._data;
-    }
-
-    public get next(): StackNode<D> | null {
-        return this._next;
-    }
-
-    public set next(node: StackNode<D> | null) {
-        this._next = node;
-    }
 }
 
 export class Stack<D>{
 
-    private top: StackNode<D> | null = null;
-    private _length = 0;
+    protected top: StackNode<D> | null = null;
+    protected _length = 0;
 
     public get length(): number {
         return this._length;
@@ -43,7 +33,7 @@ export class Stack<D>{
     }
 
     public peek(): D | null {
-        return this.top?.data || null;
+        return this.top ? this.top.data : null;
     }
 
 }
@@ -149,4 +139,43 @@ export class StackSet<D> {
         this._length--;
         return output;
     }
+}
+
+type Sorter = <D>(x: D, y: D) => -1 | 0 | 1;
+
+const defaultSort: Sorter = (x, y) => x < y ? -1 : x > y ? 1 : 0;
+
+export class SortStack<D> extends Stack<D>{
+
+    private _sort: Sorter;
+
+    constructor(sorter?: Sorter) {
+        super();
+        this._sort = sorter || defaultSort;
+    }
+
+    private _swap(x: StackNode<D>, y: StackNode<D>): void {
+        const tmp = x.data;
+        x.data = y.data;
+        y.data = tmp;
+    }
+
+    push(data: D): void {
+        super.push(data);
+        let next = this.top as StackNode<D>;
+        let comparator = next?.next || null;
+        while (comparator !== null) {
+            switch (this._sort<D>(next.data, comparator.data)) {
+                case 1:
+                    this._swap(next, comparator);
+                    next = this.top as StackNode<D>;
+                    comparator = next.next;
+                    break;
+                default:
+                    next = comparator;
+                    comparator = comparator.next;
+            }
+        }
+    }
+
 }
