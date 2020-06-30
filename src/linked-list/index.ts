@@ -1,26 +1,19 @@
 export class LinkedListNode<D> {
-    private _value: D
-    private _next: LinkedListNode<D> | null = null
+    public value: D
+    protected _next: LinkedListNode<D> | null = null
 
     constructor(value: D) {
-        this._value = value;
+        this.value = value;
     }
 
-    set value(value: D) {
-        this._value = value;
-    }
-
-    get value(): D {
-        return this._value;
+    get next(): LinkedListNode<D> | null {
+        return this._next;
     }
 
     set next(node: LinkedListNode<D> | null) {
         this._next = node;
     }
 
-    get next(): LinkedListNode<D> | null {
-        return this._next;
-    }
     insert(value: D): LinkedListNode<D>
     insert(node: LinkedListNode<D>): LinkedListNode<D>
     insert(arg: D | LinkedListNode<D>): LinkedListNode<D> {
@@ -136,5 +129,36 @@ export class LinkedList<D> {
             yield nextNode.value;
             nextNode = nextNode.next;
         }
+    }
+}
+
+
+export class DoublyLinkedListNode<D>{
+    protected _prev: DoublyLinkedListNode<D> | null = null;
+    protected _next: DoublyLinkedListNode<D> | null = null;
+    public value: D;
+
+    constructor(value: D) {
+        this.value = value;
+    }
+
+    set next(node: DoublyLinkedListNode<D> | null) {
+        if (node) node._prev = this;
+        else if (this.next) this.next._prev = null;
+        this._next = node;
+    }
+
+    get next(): DoublyLinkedListNode<D> | null {
+        return this._next;
+    }
+
+    set prev(node: DoublyLinkedListNode<D> | null) {
+        if (node) node._next = this;
+        else if (this.prev) this.prev._next = null;
+        this._prev = node;
+    }
+
+    get prev(): DoublyLinkedListNode<D> | null {
+        return this._prev;
     }
 }
