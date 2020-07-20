@@ -9,7 +9,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "eslint": "eslint",
-    "test": "node --inspect-brk ./node_modules/jest/bin/jest",
+    "test": "node --inspect node_modules/jest/bin/jest --runInBand",
     "test:watch": "tsc --project ./tsconfig.test.json",
     "build": "tsc"
   },
@@ -24,10 +24,5 @@
     "jest": "^26.0.1",
     "typescript": "^3.9.5"
   },
-  "dependencies": {},
-  "jest": {
-    "testMatch": [
-      "**/?(*.)+(spec|test).js"
-    ]
-  }
+  "dependencies": {}
 }
