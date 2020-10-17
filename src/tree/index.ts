@@ -1,7 +1,7 @@
 export class TreeNode<D>{
     protected _value: D;
-    protected _children: TreeNode<D>[] = [];
     protected _size: number;
+    protected _children: TreeNode<D>[] = [];
 
     constructor(value: D, size = 2) {
         this._value = value;
@@ -12,7 +12,7 @@ export class TreeNode<D>{
         return index >= this._size || index < 0;
     }
 
-    insert(node: TreeNode<D>, index: number,): void {
+    insert(node: TreeNode<D>, index: number): void {
         if (this._invalidIndex(index)) throw Error(`Invalid index (${index}). Attempting to add children which exceeds capacity`);
         this._children[index] = node;
     }
@@ -63,11 +63,11 @@ export class BinaryTreeNode<D> extends TreeNode<D>{
         super(value, 2);
     }
 
-    insert(node: TreeNode<D>, index: 0 | 1): void {
+    insert(node: BinaryTreeNode<D>, index: 0 | 1): void {
         this._children[index] = node;
     }
 
-    getChildNode(index: 0 | 1): TreeNode<D> | null {
+    getChildNode(index: 0 | 1): BinaryTreeNode<D> | null {
         return this._children[index] || null;
     }
 
@@ -217,5 +217,30 @@ export class Heap<D> {
     get size(): number {
         return this._nodes.length;
     }
+}
 
+export class TrieNode<D> extends TreeNode<D>{
+
+    protected _children: TrieNode<D>[] = [];
+    protected _isTerminal: boolean;
+
+    constructor(value: D, size = 2, isTerminal = false) {
+        super(value, size);
+        this._isTerminal = isTerminal;
+    }
+
+    getChildNode(index: number): TrieNode<D> | null {
+        if (this._invalidIndex(index)) throw Error(`Invalid index (${index})`);
+        return this._children[index] || null;
+    }
+
+    insert(node: TrieNode<D>, index: number): void {
+        if (this._invalidIndex(index)) throw Error(`Invalid index (${index}). Attempting to add children which exceeds capacity`);
+        if (this.isTerminal) throw Error(`Invalid operation: TrieNode attribute 'isTerminal' is true`);
+        this._children[index] = node;
+    }
+
+    get isTerminal(): boolean {
+        return this._isTerminal;
+    }
 }

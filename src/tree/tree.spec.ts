@@ -1,4 +1,11 @@
-import { TreeNode, Tree, BinaryTree, BinaryTreeNode, Heap } from '.';
+import {
+    TreeNode,
+    Tree,
+    BinaryTree,
+    BinaryTreeNode,
+    Heap,
+    TrieNode
+} from '.';
 
 describe('Tree Node', () => {
     it('Should initialize empty', () => {
@@ -150,7 +157,7 @@ describe('Heap', () => {
 
         while (minHeap.root !== undefined) {
             const min = Math.min(...cases);
-            const root = minHeap.extractRoot();
+            const root = minHeap.extractRoot() as number;
             expect(root).toBe(min);
             cases.splice(cases.indexOf(root), 1);
         }
@@ -161,9 +168,28 @@ describe('Heap', () => {
 
         while (heap3.root !== undefined) {
             const max = Math.max(...maxCases);
-            const root = heap3.extractRoot();
+            const root = heap3.extractRoot() as number;
             expect(root).toBe(max);
             maxCases.splice(maxCases.indexOf(root), 1);
         }
+    });
+});
+
+fdescribe('Trie Node', () => {
+    it('Should initialize', () => {
+        const node = new TrieNode('A', 32);
+        expect(node instanceof TrieNode);
+        expect(node.value).toBe('A');
+        expect(node.size === 32);
+        expect(node.isTerminal).toBe(false);
+        expect(node.children).toEqual([]);
+        expect(node.getChildNode(0)).toBeNull();
+        expect(() => node.getChildNode(33)).toThrow('Invalid index (33)');
+    });
+
+    it('Should not allow inserting to a terminal node', () => {
+        const node = new TrieNode(100, 16, true);
+        expect(node.isTerminal);
+        expect(() => node.insert(new TrieNode(101, 16), 0)).toThrow(`Invalid operation: TrieNode attribute 'isTerminal' is true`);
     });
 });

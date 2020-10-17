@@ -10,8 +10,8 @@
             "request": "launch",
             "args": [
                 "--runInBand",
-                // "--",
-                // "tree"
+                "--",
+                "tree"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
