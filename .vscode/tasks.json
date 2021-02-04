@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "test:watch",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: test:watch",
+			"detail": "tsc --project ./tsconfig.test.json"
+		}
+	]
+}
