@@ -1,6 +1,6 @@
 import { Queue, QueueStack } from '.';
 
-xdescribe('Queue data structure', () => {
+describe('Queue data structure', () => {
 
     it('Should initialize as empty', () => {
         const queue = new Queue();

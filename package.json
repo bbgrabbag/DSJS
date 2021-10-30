@@ -11,7 +11,8 @@
     "eslint": "eslint",
     "test": "node --inspect node_modules/jest/bin/jest --runInBand",
     "test:watch": "tsc --project ./tsconfig.test.json",
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "rm -rf ./test_build/*"
   },
   "author": "Ben Turner",
   "license": "ISC",

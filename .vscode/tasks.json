@@ -7,7 +7,15 @@
 			"group": "build",
 			"problemMatcher": [],
 			"label": "npm: test:watch",
-			"detail": "tsc --project ./tsconfig.test.json"
+			"detail": "npm run test:watch"
+		},
+		{
+			"type": "npm",
+			"script": "test",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: test",
+			"detail": "npm t"
 		}
 	]
 }

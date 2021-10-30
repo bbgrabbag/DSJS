@@ -1,6 +1,6 @@
 import { Stack, ArrayStack, IntStack, StackSet, SortStack } from '.';
 
-xdescribe('Stacks', () => {
+describe('Stacks', () => {
     it('Should initialize as empty', () => {
         const stack = new Stack<void>();
         expect(stack.length).toBe(0);
@@ -31,7 +31,7 @@ xdescribe('Stacks', () => {
     });
 });
 
-xdescribe('Array Stacks', () => {
+describe('Array Stacks', () => {
     it('Should initialize as empty with default or specified size', () => {
         const stack = new ArrayStack();
         expect(stack.peek()).toBe(null);
@@ -67,7 +67,7 @@ xdescribe('Array Stacks', () => {
 });
 
 
-xdescribe('Int Stack', () => {
+describe('Int Stack', () => {
     it('Should initialize as null', () => {
         const stack = new IntStack();
         expect(stack.length).toBe(0);
@@ -120,7 +120,7 @@ xdescribe('Int Stack', () => {
     });
 });
 
-xdescribe('Stack Set', () => {
+describe('Stack Set', () => {
     it('Should initialize empty', () => {
         const stack = new StackSet<number>();
         expect(stack.length).toBe(0);
