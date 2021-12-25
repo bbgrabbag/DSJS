@@ -1,35 +1,103 @@
-import {GraphNode} from './';
+import { GraphNode, Graph, InvalidGraphNodeChildError } from "./";
 
-describe('Graph Node', () => {
-    it('Should initialize', () => {
-        const graphNode = new GraphNode(100);
-        expect(graphNode.value).toBe(100);
-        expect(graphNode.children).toEqual([]);
-        expect(graphNode.length).toEqual(0);
-    });
+describe("Graph", () => {
+  it("Should be able to create nodes", () => {
+    const graph = new Graph();
+    const node = graph.createNode(0);
+    expect(node instanceof GraphNode).toBe(true);
+    expect(node.value).toBe(0);
+  });
 
-    it('Should insert and retrieve nodes and values', () => {
-        const graphNode = new GraphNode(100);
-        graphNode.append(101);
-        graphNode.append(new GraphNode(102));
+  it("Should assign id's upon creating nodes", () => {
+    const graph = new Graph();
+    const node1 = graph.createNode(0);
+    const node2 = graph.createNode(0);
+    const node3 = graph.createNode(0);
+    expect(node1.id).toBe(0);
+    expect(node2.id).toBe(1);
+    expect(node3.id).toBe(2);
+  });
 
-        expect(graphNode.length).toBe(2);
-        const firstChild = graphNode.getNodeAtIndex(0) as GraphNode<number>;
-        expect(firstChild.value).toBe(101);
-        const secondChildValue = graphNode.getValueAtIndex(1) as number;
-        expect(secondChildValue).toBe(102);
-        const nonexistant = graphNode.getValueAtIndex(-1);
-        expect(nonexistant).toBe(undefined);
+  it("Should validate nodes that belong to the graph", () => {
+    const graph = new Graph();
+    const other = new Graph();
+    const node = graph.createNode(0);
+    const otherNode = other.createNode(0);
+    expect(graph.validateNode(node)).toBe(true);
+    expect(graph.validateNode(otherNode)).toBe(false);
+  });
 
-    });
+  it("Should produce a node from a given value/node", () => {
+    const graph = new Graph();
+    const node = graph.createNode(0);
+    const sameNode = graph.fromNodeOrValue(node);
+    const newNode = graph.fromNodeOrValue(0);
+    expect(node).toBe(sameNode);
+    expect(node.id).toBe(0);
+    expect(newNode instanceof GraphNode).toBe(true);
+    expect(newNode.value).toBe(0);
+    expect(newNode.id).toBe(1);
+  });
+});
 
-    it('Should update values', () => {
-        const graphNode = new GraphNode(100);
-        graphNode.value = 101;
-        graphNode.append(200);
-        graphNode.children[0].value = 202;
-        
-        expect(graphNode.value).toBe(101);
-        expect(graphNode.children[0].value).toBe(202);
-    });
+describe("Graph Node", () => {
+  it("Should initialize", () => {
+    const graph = new Graph();
+    const node = graph.createNode(100);
+    expect(node.id).toBe(0);
+    expect(node.value).toBe(100);
+    expect(node.children).toEqual([]);
+    expect(node.length).toEqual(0);
+    expect(node.graph).toBe(graph);
+  });
+
+  it("Should insert nodes and values", () => {
+    const graph = new Graph();
+    const node = graph.createNode<number | string>(100);
+    node.insert(0, 1, 2, 3);
+    expect(node.length).toBe(3);
+    node.insert(
+      0,
+      graph.createNode(100),
+      graph.createNode(100),
+      graph.createNode(100)
+    );
+    expect(node.length).toBe(6);
+    node.append("appended");
+    expect(node.last?.value).toBe("appended");
+    node.prepend("prepended");
+    expect(node.first?.value).toBe("prepended");
+  });
+
+  it("Should remove nodes", () => {
+    const graph = new Graph();
+    const node = graph.createNode(0);
+    node.insert(0, 1, 2, 3, 4);
+    node.delete(0);
+    node.delete(2);
+    expect(node.length).toBe(2);
+    expect(node.get(0)?.value).toBe(2);
+    expect(node.get(1)?.value).toBe(3);
+  });
+
+  it("Should not allow nodes to append other nodes from a different graph", () => {
+    const graph = new Graph();
+    const other = new Graph();
+    const graphNode = graph.createNode(100);
+    const otherGraphNode = other.createNode(101);
+    expect(() => graphNode.append(otherGraphNode)).toThrowError(
+      InvalidGraphNodeChildError
+    );
+  });
+
+  it("Should update values", () => {
+    const graph = new Graph();
+    const node = graph.createNode(100);
+    node.value = 101;
+    node.append(200);
+    (node.get(0) as GraphNode<number>).value = 202;
+
+    expect(node.value).toBe(101);
+    expect((node.get(0) as GraphNode<number>).value).toBe(202);
+  });
 });
