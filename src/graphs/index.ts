@@ -1,8 +1,17 @@
+// import {Queue} from '../queue';
+
 export type GraphNodeId = string | number;
 
 export class InvalidGraphNodeChildError implements Error {
   name = "InvalidGraphNodeChildError";
   message = "Child nodes must belong to the same graph";
+}
+export class DuplicateGraphNodeChildError implements Error {
+  name = "DuplicateGraphNodeChildError";
+  message: string;
+  constructor(id: GraphNodeId) {
+    this.message = `Parent node already contains child with id (${id})`;
+  }
 }
 
 export class GraphNode<V> {
@@ -42,7 +51,7 @@ export class GraphNode<V> {
   }
 
   get children(): Readonly<GraphNode<V>[]> {
-    return Object.freeze(this._children);
+    return Object.freeze([...this._children]);
   }
 
   get length(): number {
@@ -61,21 +70,24 @@ export class GraphNode<V> {
     this._children.splice(index, 1);
   }
 
+  hasChild(node: GraphNode<V>): boolean {
+    return !!this._children.find((n) => n === node);
+  }
+
   insert(start: number, ...nodeOrValues: (V | GraphNode<V>)[]): void {
     this._children.splice(
       start,
       0,
-      ...nodeOrValues.map((n) => {
+      ...nodeOrValues.map((n, i) => {
         const node = this.graph.fromNodeOrValue(n);
+        if (nodeOrValues.indexOf(node, i + 1) > -1 || this.hasChild(node))
+          throw new DuplicateGraphNodeChildError(node.id);
         if (!this.graph.validateNode(node))
           throw new InvalidGraphNodeChildError();
         return node;
       })
     );
   }
-
-  // bfSearch(){}
-  // dfSearch(){}
 }
 
 export interface GraphComparator {
@@ -110,5 +122,23 @@ export class Graph {
 
   validateNode<V>(node: GraphNode<V>): boolean {
     return this === node.graph;
+  }
+
+  depthSearch<V>(
+    start: GraphNode<V>,
+    compare: (node: GraphNode<V>) => boolean,
+    checklist: { [K: string]: boolean } = {}
+  ): null | GraphNode<V> {
+    if (!checklist[start.id] && compare(start)) {
+      checklist[start.id] = true;
+      return start;
+    }
+    checklist[start.id] = true;
+    for (const node of start.children) {
+      if (checklist[node.id]) continue;
+      const found = this.depthSearch(node, compare, checklist);
+      if (found) return found;
+    }
+    return null;
   }
 }

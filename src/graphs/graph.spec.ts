@@ -38,6 +38,23 @@ describe("Graph", () => {
     expect(newNode.value).toBe(0);
     expect(newNode.id).toBe(1);
   });
+
+  it("Should search nodes via depth search", () => {
+    const graph = new Graph();
+    const start = graph.createNode("start");
+    const target = graph.createNode("target");
+    start.insert(0, "a", "b", "c", "d", "e");
+    const child = start.get(0) as GraphNode<string>;
+    child.insert(0, "f", "g", "h");
+    expect(graph.depthSearch(start, (node) => node.id === "none")).toBeNull();
+    const grandChild = child.get(0) as GraphNode<string>;
+    grandChild.insert(0, "i", "j", "k", start, target);
+    const comparator = jest.fn((node: GraphNode<string>) => node === target);
+    expect(graph.depthSearch(start, comparator)).toBe(target);
+    expect(comparator).toHaveBeenCalledTimes(7);
+  });
+
+  // it("Should search nodes via breadth search", () => {});
 });
 
 describe("Graph Node", () => {
@@ -90,13 +107,21 @@ describe("Graph Node", () => {
     );
   });
 
+  it("Should not allow insertion of duplicate direct child nodes", () => {
+    const graph = new Graph();
+    const node = graph.createNode(0);
+    const duplicate = graph.createNode(0);
+    expect(() => node.insert(0, duplicate, duplicate)).toThrowError(
+      "Parent node already contains child with id (1)"
+    );
+  });
+
   it("Should update values", () => {
     const graph = new Graph();
     const node = graph.createNode(100);
     node.value = 101;
     node.append(200);
     (node.get(0) as GraphNode<number>).value = 202;
-
     expect(node.value).toBe(101);
     expect((node.get(0) as GraphNode<number>).value).toBe(202);
   });

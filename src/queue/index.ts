@@ -74,7 +74,6 @@ export class QueueStack<D> extends Queue<D>{
         return this._next?.data || null;
     }
 
-
     enqueue(data: D): void {
         if (this._next === null) this._next = new QueueNode<D>(data);
         if (this._remover.length) {

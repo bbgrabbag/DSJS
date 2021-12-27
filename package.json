@@ -9,8 +9,8 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "eslint": "eslint",
-    "test": "node --inspect node_modules/jest/bin/jest --runInBand",
-    "test:watch": "tsc --project ./tsconfig.test.json",
+    "test:debug": "node --inspect node_modules/jest/bin/jest --runInBand",
+    "dev:watch": "tsc --project ./tsconfig.test.json",
     "build": "tsc",
     "clean": "rm -rf ./test_build/*"
   },

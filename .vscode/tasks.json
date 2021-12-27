@@ -3,18 +3,18 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "test:watch",
+			"script": "dev:watch",
 			"group": "build",
 			"problemMatcher": [],
-			"label": "npm: test:watch",
-			"detail": "npm run test:watch"
+			"label": "npm: dev:watch",
+			"detail": "npm run dev:watch"
 		},
 		{
 			"type": "npm",
-			"script": "test",
+			"script": "test:debug",
 			"group": "build",
 			"problemMatcher": [],
-			"label": "npm: test",
+			"label": "npm: test:debug",
 			"detail": "npm t"
 		}
 	]
