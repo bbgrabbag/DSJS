@@ -1,6 +1,6 @@
 import { GraphNode, Graph, InvalidGraphNodeChildError } from "./";
 
-describe("Graph", () => {
+describe("Graph data structure", () => {
   it("Should be able to create nodes", () => {
     const graph = new Graph();
     const node = graph.createNode(0);
@@ -54,10 +54,21 @@ describe("Graph", () => {
     expect(comparator).toHaveBeenCalledTimes(7);
   });
 
-  // it("Should search nodes via breadth search", () => {});
+  it("Should search nodes via breadth search", () => {
+    const graph = new Graph();
+    const start = graph.createNode("start");
+    const target = graph.createNode("target");
+    start.insert(0, "a", "b", "c", "d", "e");
+    const child = start.get(0) as GraphNode<string>;
+    child.insert(0, "f", "g", "h", "i", "j", start, target);
+    expect(graph.breadthSearch(start, (node) => node.id === "none")).toBeNull();
+    const comparator = jest.fn((node: GraphNode<string>) => node === target);
+    expect(graph.breadthSearch(start, comparator)).toBe(target);
+    expect(comparator).toHaveBeenCalledTimes(12);
+  });
 });
 
-describe("Graph Node", () => {
+describe("GraphNode data tsructure", () => {
   it("Should initialize", () => {
     const graph = new Graph();
     const node = graph.createNode(100);

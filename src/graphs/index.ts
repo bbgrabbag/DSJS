@@ -1,4 +1,4 @@
-// import {Queue} from '../queue';
+import { Queue } from "../queue";
 
 export type GraphNodeId = string | number;
 
@@ -138,6 +138,24 @@ export class Graph {
       if (checklist[node.id]) continue;
       const found = this.depthSearch(node, compare, checklist);
       if (found) return found;
+    }
+    return null;
+  }
+
+  breadthSearch<V>(
+    start: GraphNode<V>,
+    compare: (node: GraphNode<V>) => boolean,
+    checklist: { [K: string]: boolean } = {}
+  ): null | GraphNode<V> {
+    const queue = new Queue<GraphNode<V>>();
+    queue.enqueue(start);
+    while (queue.length) {
+      const current = queue.dequeue();
+      if (compare(current))  return current;
+      checklist[current.id] = true;
+      for (const node of current.children) {
+        if(!checklist[node.id]) queue.enqueue(node);
+      }
     }
     return null;
   }
