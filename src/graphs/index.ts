@@ -6,6 +6,7 @@ export class InvalidGraphNodeChildError implements Error {
   name = "InvalidGraphNodeChildError";
   message = "Child nodes must belong to the same graph";
 }
+
 export class DuplicateGraphNodeChildError implements Error {
   name = "DuplicateGraphNodeChildError";
   message: string;
@@ -52,6 +53,10 @@ export class GraphNode<V> {
 
   get children(): Readonly<GraphNode<V>[]> {
     return Object.freeze([...this._children]);
+  }
+
+  get childValues(): Readonly<V[]>{
+    return this._children.map(child => child.value);
   }
 
   get length(): number {

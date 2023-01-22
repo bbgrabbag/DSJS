@@ -84,6 +84,7 @@ describe("GraphNode data tsructure", () => {
     const node = graph.createNode<number | string>(100);
     node.insert(0, 1, 2, 3);
     expect(node.length).toBe(3);
+    expect(node.childValues).toEqual([1, 2, 3]);
     node.insert(
       0,
       graph.createNode(100),
@@ -95,6 +96,18 @@ describe("GraphNode data tsructure", () => {
     expect(node.last?.value).toBe("appended");
     node.prepend("prepended");
     expect(node.first?.value).toBe("prepended");
+    node.insert(1, 201);
+    expect(node.childValues).toEqual([
+      "prepended",
+      201,
+      100,
+      100,
+      100,
+      1,
+      2,
+      3,
+      "appended",
+    ]);
   });
 
   it("Should remove nodes", () => {
