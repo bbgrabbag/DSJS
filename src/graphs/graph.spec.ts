@@ -13,9 +13,9 @@ describe("Graph data structure", () => {
     const node1 = graph.createNode(0);
     const node2 = graph.createNode(0);
     const node3 = graph.createNode(0);
-    expect(node1.id).toBe(0);
-    expect(node2.id).toBe(1);
-    expect(node3.id).toBe(2);
+    expect(node1.id).toBe('0');
+    expect(node2.id).toBe('1');
+    expect(node3.id).toBe('2');
   });
 
   it("Should validate nodes that belong to the graph", () => {
@@ -33,10 +33,23 @@ describe("Graph data structure", () => {
     const sameNode = graph.fromNodeOrValue(node);
     const newNode = graph.fromNodeOrValue(0);
     expect(node).toBe(sameNode);
-    expect(node.id).toBe(0);
+    expect(node.id).toBe('0');
     expect(newNode instanceof GraphNode).toBe(true);
     expect(newNode.value).toBe(0);
-    expect(newNode.id).toBe(1);
+    expect(newNode.id).toBe('1');
+  });
+
+  it("Should register nodes on create/insert", () => {
+    const graph = new Graph();
+    const node = graph.createNode(0);
+    expect(graph.getNodeById('0')).toBe(node);
+    node.append(1);
+    const child = node.first;
+    expect(graph.getNodeById('1')).toBe(child);
+    node.insert(1, 2);
+    const sibling = node.last;
+    expect(graph.getNodeById('2')).toBe(sibling);
+    expect(graph.getNodeIds()).toEqual(['0','1','2']);
   });
 
   it("Should search nodes via depth search", () => {
@@ -68,11 +81,11 @@ describe("Graph data structure", () => {
   });
 });
 
-describe("GraphNode data tsructure", () => {
+describe("GraphNode data structure", () => {
   it("Should initialize", () => {
     const graph = new Graph();
     const node = graph.createNode(100);
-    expect(node.id).toBe(0);
+    expect(node.id).toBe('0');
     expect(node.value).toBe(100);
     expect(node.children).toEqual([]);
     expect(node.length).toEqual(0);

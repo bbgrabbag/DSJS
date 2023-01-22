@@ -1,6 +1,6 @@
 import { Queue } from "../queue";
 
-export type GraphNodeId = string | number;
+export type GraphNodeId = string;
 
 export class InvalidGraphNodeChildError implements Error {
   name = "InvalidGraphNodeChildError";
@@ -17,7 +17,7 @@ export class DuplicateGraphNodeChildError implements Error {
 
 export class GraphNode<V> {
   private _value: V;
-  private _children: GraphNode<V>[] = [];
+  protected _children: GraphNode<V>[] = [];
   readonly _id: GraphNodeId;
   graph: Graph;
 
@@ -25,6 +25,7 @@ export class GraphNode<V> {
     this._id = id;
     this._value = value;
     this.graph = graph;
+    this.graph.registerNode(this);
   }
 
   get id(): GraphNodeId {
@@ -55,8 +56,8 @@ export class GraphNode<V> {
     return Object.freeze([...this._children]);
   }
 
-  get childValues(): Readonly<V[]>{
-    return this._children.map(child => child.value);
+  get childValues(): Readonly<V[]> {
+    return this._children.map((child) => child.value);
   }
 
   get length(): number {
@@ -105,24 +106,46 @@ export interface GraphIdGenerator {
 
 export const serialIdGeneratorFactory = (): GraphIdGenerator => {
   let id = 0;
-  return () => id++;
+  return () => String(id++);
 };
 
 export class Graph {
   private genId: GraphIdGenerator;
+  private _registry: Record<GraphNodeId, GraphNode<unknown>>;
 
   constructor(idGenerator: GraphIdGenerator = serialIdGeneratorFactory()) {
     this.genId = idGenerator;
+    this._registry = {};
   }
 
-  createNode<V>(value: V): GraphNode<V> {
-    return new GraphNode(value, this.genId(), this);
+  unregisterNode<V>(id: GraphNodeId): void {
+    if (this._registry[id]) delete this._registry[id];
   }
 
-  fromNodeOrValue<V>(nodeOrValue: V | GraphNode<V>): GraphNode<V> {
+  registerNode<V>(node: GraphNode<V>): void {
+    this._registry[node.id] = node;
+  }
+
+  getNodeIds(): Array<GraphNodeId> {
+    return Object.keys(this._registry);
+  }
+
+  getNodeById<V>(id: GraphNodeId): GraphNode<V> | null {
+    return (this._registry[id] as GraphNode<V>) || null;
+  }
+
+  createNode<V>(value: V, id?: GraphNodeId): GraphNode<V> {
+    const node = new GraphNode(value, id ?? this.genId(), this);
+    return node;
+  }
+
+  fromNodeOrValue<V>(
+    nodeOrValue: V | GraphNode<V>,
+    id?: GraphNodeId
+  ): GraphNode<V> {
     return nodeOrValue instanceof GraphNode
       ? nodeOrValue
-      : this.createNode(nodeOrValue);
+      : this.createNode(nodeOrValue, id);
   }
 
   validateNode<V>(node: GraphNode<V>): boolean {
@@ -156,12 +179,16 @@ export class Graph {
     queue.enqueue(start);
     while (queue.length) {
       const current = queue.dequeue();
-      if (compare(current))  return current;
+      if (compare(current)) return current;
       checklist[current.id] = true;
       for (const node of current.children) {
-        if(!checklist[node.id]) queue.enqueue(node);
+        if (!checklist[node.id]) queue.enqueue(node);
       }
     }
     return null;
+  }
+
+  shortestPath<V>(): null | GraphNode<V>[] {
+    return [];
   }
 }
