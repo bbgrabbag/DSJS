@@ -13,9 +13,9 @@ describe("Graph data structure", () => {
     const node1 = graph.createNode(0);
     const node2 = graph.createNode(0);
     const node3 = graph.createNode(0);
-    expect(node1.id).toBe('0');
-    expect(node2.id).toBe('1');
-    expect(node3.id).toBe('2');
+    expect(node1.id).toBe("0");
+    expect(node2.id).toBe("1");
+    expect(node3.id).toBe("2");
   });
 
   it("Should validate nodes that belong to the graph", () => {
@@ -33,23 +33,23 @@ describe("Graph data structure", () => {
     const sameNode = graph.fromNodeOrValue(node);
     const newNode = graph.fromNodeOrValue(0);
     expect(node).toBe(sameNode);
-    expect(node.id).toBe('0');
+    expect(node.id).toBe("0");
     expect(newNode instanceof GraphNode).toBe(true);
     expect(newNode.value).toBe(0);
-    expect(newNode.id).toBe('1');
+    expect(newNode.id).toBe("1");
   });
 
   it("Should register nodes on create/insert", () => {
     const graph = new Graph();
     const node = graph.createNode(0);
-    expect(graph.getNodeById('0')).toBe(node);
+    expect(graph.getNodeById("0")).toBe(node);
     node.append(1);
     const child = node.first;
-    expect(graph.getNodeById('1')).toBe(child);
+    expect(graph.getNodeById("1")).toBe(child);
     node.insert(1, 2);
     const sibling = node.last;
-    expect(graph.getNodeById('2')).toBe(sibling);
-    expect(graph.getNodeIds()).toEqual(['0','1','2']);
+    expect(graph.getNodeById("2")).toBe(sibling);
+    expect(graph.getNodeIds()).toEqual(["0", "1", "2"]);
   });
 
   it("Should search nodes via depth search", () => {
@@ -79,13 +79,51 @@ describe("Graph data structure", () => {
     expect(graph.breadthSearch(start, comparator)).toBe(target);
     expect(comparator).toHaveBeenCalledTimes(12);
   });
+
+  it("Should get shortest path between nodes", () => {
+    const graph = new Graph();
+    const start = graph.createNode("start", "start");
+    const finish = graph.createNode("finish", "finish");
+    const first = graph.createNode("first", "first");
+    const second = graph.createNode("second", "second");
+    const third = graph.createNode("third", "third");
+    const fourth = graph.createNode("fourth", "fourth");
+    start.insert(0, "0", "1", "2", first, "3", "4", "5");
+    first.insert(0, "0", "1", "2", second, "3", "4", "5");
+    second.insert(0, "0", "1", "2", third, "3", "4", "5");
+    third.insert(0, "0", "1", "2", fourth, "3", "4", "5");
+    fourth.insert(0, "0", "1", "2", finish, "3", "4", "5");
+    const path = graph.shortestPath(start, finish);
+    expect(path?.map((n) => n.id)).toEqual([
+      finish.id,
+      fourth.id,
+      third.id,
+      second.id,
+      first.id,
+      start.id,
+    ]);
+  });
+  it("Should return null of no path is possible", () => {
+    const graph = new Graph();
+    const start = graph.createNode("start", "start");
+    const finish = graph.createNode("finish", "finish");
+    const first = graph.createNode("first", "first");
+    const second = graph.createNode("second", "second");
+    const third = graph.createNode("third", "third");
+    start.insert(0, "0", "1", "2", first, "3", "4", "5");
+    first.insert(0, "0", "1", "2", second, "3", "4", "5");
+    second.insert(0, "0", "1", "2", third, "3", "4", "5");
+    third.insert(0, "0", "1", "2", "3", "4", "5");
+    const path = graph.shortestPath(start, finish);
+    expect(path).toBeNull();
+  });
 });
 
 describe("GraphNode data structure", () => {
   it("Should initialize", () => {
     const graph = new Graph();
     const node = graph.createNode(100);
-    expect(node.id).toBe('0');
+    expect(node.id).toBe("0");
     expect(node.value).toBe(100);
     expect(node.children).toEqual([]);
     expect(node.length).toEqual(0);

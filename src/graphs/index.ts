@@ -188,7 +188,36 @@ export class Graph {
     return null;
   }
 
-  shortestPath<V>(): null | GraphNode<V>[] {
-    return [];
+  shortestPath<V>(
+    start: GraphNode<V>,
+    finish: GraphNode<V>
+  ): null | GraphNode<V>[] {
+    const checklist: Record<GraphNodeId, boolean> = {};
+    const nodePairs: Record<GraphNodeId, GraphNodeId | null> = {};
+    const queue = new Queue<[GraphNode<V>, GraphNode<V> | null]>();
+    queue.enqueue([start, null]);
+
+    const producePathFromNodePairs = (
+      finish: GraphNode<V>
+    ): Array<GraphNode<V>> => {
+      const output: Array<GraphNode<V>> = [finish];
+      let next = nodePairs[finish.id];
+      while (next) {
+        output.push(this.getNodeById(next) as GraphNode<V>);
+        next = nodePairs[next];
+      }
+      return output;
+    };
+
+    while (queue.length) {
+      const [node, parent] = queue.dequeue();
+      checklist[node.id] = true;
+      nodePairs[node.id] = parent?.id ?? null;
+      if (node.id == finish.id) return producePathFromNodePairs(node);
+      node.children.forEach((child) => {
+        if (!checklist[child.id]) queue.enqueue([child, node]);
+      });
+    }
+    return null;
   }
 }
