@@ -8,9 +8,6 @@ JS Library of common data structures inspired by Cracking the Code
 #Install
 npm i dsjs
 
-#Watch for changes
-npm run test:watch
-
 #Run tests
 npm t
 
@@ -21,12 +18,19 @@ npm t -- <name-of-test-file>
 npm run build
 ```
 
+> *Note:* To run tests in debug mode using VS Code, click `Debug` icon from left menu and select `Run DSJS unit tests` configuration and click green button or press `F5`. 
+> 
+>Tasks for running the above npm scripts can be found under `/.vscode/tasks.json`
+
+ 
+
 ### Table of Contents
 
 - [Linked List](#linked-list)
 - [Stack](#stack)
 - [Queue](#queue)
 - [Tree](#tree)
+- [Graph](#graph)
 
 ### Linked List
 
@@ -57,4 +61,10 @@ import {
   Heap,
   TrieNode,
 } from "dsjs";
+```
+
+### Graph
+
+```js
+import { Graph, GraphNode } from "dsjs";
 ```
