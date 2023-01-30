@@ -1,223 +1,145 @@
 import { Queue } from "../queue";
 
-export type GraphNodeId = string;
+export type NodeOrValue<V> = BaseGraphNode<V> | V;
 
-export class InvalidGraphNodeChildError implements Error {
-  name = "InvalidGraphNodeChildError";
-  message = "Child nodes must belong to the same graph";
-}
+export class BaseGraphNode<V = unknown> {
+  value: V;
+  private children: Map<BaseGraphNode<V>, V>;
+  graph: Graph<V>;
 
-export class DuplicateGraphNodeChildError implements Error {
-  name = "DuplicateGraphNodeChildError";
-  message: string;
-  constructor(id: GraphNodeId) {
-    this.message = `Parent node already contains child with id (${id})`;
-  }
-}
-
-export class GraphNode<V> {
-  private _value: V;
-  protected _children: GraphNode<V>[] = [];
-  readonly _id: GraphNodeId;
-  graph: Graph;
-
-  constructor(value: V, id: GraphNodeId, graph: Graph) {
-    this._id = id;
-    this._value = value;
+  constructor(value: V, graph: Graph<V>) {
+    this.value = value;
+    this.children = new Map<BaseGraphNode<V>, V>();
     this.graph = graph;
-    this.graph.registerNode(this);
   }
 
-  get id(): GraphNodeId {
-    return this._id;
+  get childCount(): number {
+    return this.children.size;
   }
 
-  get value(): V {
-    return this._value;
+  get childNodes(): Array<BaseGraphNode<V>> {
+    return Array.from(this.children.keys());
   }
 
-  set value(v: V) {
-    this._value = v;
+  hasChild(node: BaseGraphNode<V>): boolean {
+    return this.children.has(node);
   }
 
-  get(i: number): GraphNode<V> | undefined {
-    return this._children[i];
-  }
-
-  get last(): GraphNode<V> | undefined {
-    return this._children[this.length - 1];
-  }
-
-  get first(): GraphNode<V> | undefined {
-    return this._children[0];
-  }
-
-  get children(): Readonly<GraphNode<V>[]> {
-    return Object.freeze([...this._children]);
-  }
-
-  get childValues(): Readonly<V[]> {
-    return this._children.map((child) => child.value);
-  }
-
-  get length(): number {
-    return this._children.length;
-  }
-
-  append(nodeOrValue: V | GraphNode<V>): void {
-    this.insert(this.length, nodeOrValue);
-  }
-
-  prepend(nodeOrValue: V | GraphNode<V>): void {
-    this.insert(0, nodeOrValue);
-  }
-
-  delete(index: number): void {
-    this._children.splice(index, 1);
-  }
-
-  hasChild(node: GraphNode<V>): boolean {
-    return !!this._children.find((n) => n === node);
-  }
-
-  insert(start: number, ...nodeOrValues: (V | GraphNode<V>)[]): void {
-    this._children.splice(
-      start,
-      0,
-      ...nodeOrValues.map((n, i) => {
-        const node = this.graph.fromNodeOrValue(n);
-        if (nodeOrValues.indexOf(node, i + 1) > -1 || this.hasChild(node))
-          throw new DuplicateGraphNodeChildError(node.id);
-        if (!this.graph.validateNode(node))
-          throw new InvalidGraphNodeChildError();
-        return node;
-      })
-    );
-  }
-}
-
-export interface GraphComparator {
-  <V>(val1: V, val2: V): boolean;
-}
-
-export interface GraphIdGenerator {
-  (): GraphNodeId;
-}
-
-export const serialIdGeneratorFactory = (): GraphIdGenerator => {
-  let id = 0;
-  return () => String(id++);
-};
-
-export class Graph {
-  private genId: GraphIdGenerator;
-  private _registry: Record<GraphNodeId, GraphNode<unknown>>;
-
-  constructor(idGenerator: GraphIdGenerator = serialIdGeneratorFactory()) {
-    this.genId = idGenerator;
-    this._registry = {};
-  }
-
-  unregisterNode<V>(id: GraphNodeId): void {
-    if (this._registry[id]) delete this._registry[id];
-  }
-
-  registerNode<V>(node: GraphNode<V>): void {
-    this._registry[node.id] = node;
-  }
-
-  getNodeIds(): Array<GraphNodeId> {
-    return Object.keys(this._registry);
-  }
-
-  getNodeById<V>(id: GraphNodeId): GraphNode<V> | null {
-    return (this._registry[id] as GraphNode<V>) || null;
-  }
-
-  createNode<V>(value: V, id?: GraphNodeId): GraphNode<V> {
-    const node = new GraphNode(value, id ?? this.genId(), this);
+  append(nodeOrValue: V | this): BaseGraphNode<V> {
+    const node =
+      nodeOrValue instanceof BaseGraphNode
+        ? nodeOrValue
+        : this.graph.createNode(nodeOrValue);
+    this.children.set(node, node.value);
     return node;
   }
 
-  fromNodeOrValue<V>(
-    nodeOrValue: V | GraphNode<V>,
-    id?: GraphNodeId
-  ): GraphNode<V> {
-    return nodeOrValue instanceof GraphNode
-      ? nodeOrValue
-      : this.createNode(nodeOrValue, id);
+  remove(node: BaseGraphNode<V>): void {
+    this.children.delete(node);
   }
 
-  validateNode<V>(node: GraphNode<V>): boolean {
-    return this === node.graph;
-  }
+  depthSearch(
+    lookingFor: BaseGraphNode<V>,
+    startingNode: BaseGraphNode<V> = this,
+    searched = new Map<BaseGraphNode<V>, true>()
+  ): boolean {
+    if (startingNode == lookingFor) return true;
+    searched.set(startingNode, true);
 
-  depthSearch<V>(
-    start: GraphNode<V>,
-    compare: (node: GraphNode<V>) => boolean,
-    checklist: { [K: string]: boolean } = {}
-  ): null | GraphNode<V> {
-    if (!checklist[start.id] && compare(start)) {
-      checklist[start.id] = true;
-      return start;
+    for (const child of startingNode.childNodes) {
+      if (!searched.has(child)) {
+        const found = this.depthSearch(lookingFor, child, searched);
+        if (found) return found;
+      }
     }
-    checklist[start.id] = true;
-    for (const node of start.children) {
-      if (checklist[node.id]) continue;
-      const found = this.depthSearch(node, compare, checklist);
-      if (found) return found;
-    }
-    return null;
+    return false;
   }
 
-  breadthSearch<V>(
-    start: GraphNode<V>,
-    compare: (node: GraphNode<V>) => boolean,
-    checklist: { [K: string]: boolean } = {}
-  ): null | GraphNode<V> {
-    const queue = new Queue<GraphNode<V>>();
-    queue.enqueue(start);
+  breadthSearch(lookingFor: BaseGraphNode<V>): boolean {
+    const searched = new Map<BaseGraphNode<V>, true>();
+    const queue = new Queue<BaseGraphNode<V>>();
+    queue.enqueue(this);
     while (queue.length) {
-      const current = queue.dequeue();
-      if (compare(current)) return current;
-      checklist[current.id] = true;
-      for (const node of current.children) {
-        if (!checklist[node.id]) queue.enqueue(node);
+      const node = queue.dequeue();
+      if (node == lookingFor) return true;
+      if (searched.has(node)) continue;
+      searched.set(node, true);
+      for (const child of node.childNodes) {
+        if (!searched.has(child)) queue.enqueue(child);
       }
     }
-    return null;
+    return false;
   }
 
-  shortestPath<V>(
-    start: GraphNode<V>,
-    finish: GraphNode<V>
-  ): null | GraphNode<V>[] {
-    const checklist: Record<GraphNodeId, boolean> = {};
-    const nodePairs: Record<GraphNodeId, GraphNodeId | null> = {};
-    const queue = new Queue<[GraphNode<V>, GraphNode<V> | null]>();
-    queue.enqueue([start, null]);
+  shortestPath(destination: BaseGraphNode<V>): null | BaseGraphNode<V>[] {
+    const searched = new Map<BaseGraphNode<V>, true>();
+    const nodePairs = new Map<BaseGraphNode<V>, BaseGraphNode<V> | null>();
+    const queue = new Queue<[BaseGraphNode<V>, BaseGraphNode<V> | null]>();
 
-    const producePathFromNodePairs = (
-      finish: GraphNode<V>
-    ): Array<GraphNode<V>> => {
-      const output: Array<GraphNode<V>> = [finish];
-      let next = nodePairs[finish.id];
-      while (next) {
-        output.push(this.getNodeById(next) as GraphNode<V>);
-        next = nodePairs[next];
-      }
-      return output;
-    };
+    queue.enqueue([this, null]);
 
     while (queue.length) {
       const [node, parent] = queue.dequeue();
-      checklist[node.id] = true;
-      nodePairs[node.id] = parent?.id ?? null;
-      if (node.id == finish.id) return producePathFromNodePairs(node);
-      node.children.forEach((child) => {
-        if (!checklist[child.id]) queue.enqueue([child, node]);
-      });
+      if (searched.has(node)) continue;
+      nodePairs.set(node, parent);
+      searched.set(node, true);
+      if (node == destination) break;
+      for (const child of node.childNodes) {
+        if (!searched.has(child)) queue.enqueue([child, node]);
+      }
     }
-    return null;
+
+    if (!nodePairs.has(destination)) return null;
+
+    const path = [];
+    let current = destination;
+    while (current) {
+      path.unshift(current);
+      current = nodePairs.get(current) as BaseGraphNode<V>;
+    }
+
+    return path;
+  }
+}
+
+export class Graph<V = unknown> {
+  private nodeRegistry: Set<BaseGraphNode<V>>;
+
+  constructor() {
+    this.nodeRegistry = new Set<BaseGraphNode<V>>();
+  }
+
+  get size(): number {
+    return this.nodeRegistry.size;
+  }
+
+  createNode(value: V): BaseGraphNode<V> {
+    const node = new BaseGraphNode<V>(value, this);
+    this.nodeRegistry.add(node);
+    return node;
+  }
+
+  deleteNode(node: BaseGraphNode<V>): void {
+    this.nodeRegistry.delete(node);
+    this.nodeRegistry.forEach((v, registeredNode) => {
+      registeredNode.remove(node);
+    });
+  }
+
+  cloneNode(node: BaseGraphNode<V>): BaseGraphNode<V> {
+    const clone = this.createNode(node.value);
+    node.childNodes.forEach((child) => clone.append(child));
+    return clone;
+  }
+
+  findNode(cb: (n: BaseGraphNode<V>) => boolean): BaseGraphNode<V> | void {
+    for (const node of this.nodeRegistry.values()) if (cb(node)) return node;
+  }
+
+  findAllNodes(cb: (n: BaseGraphNode<V>) => boolean): BaseGraphNode<V>[] {
+    const output = [];
+    for (const node of this.nodeRegistry.values())
+      if (cb(node)) output.push(node);
+    return output;
   }
 }

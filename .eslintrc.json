@@ -20,5 +20,5 @@
         "semi":"error",
         "no-multiple-empty-lines":"error"
     },
-    "ignorePatterns": ["lib","*_build", "jest.config.ts"]
+    "ignorePatterns": ["lib","*_build", "jest.config.ts", "node_modules"]
 }

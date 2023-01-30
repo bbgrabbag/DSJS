@@ -10,8 +10,8 @@
   "scripts": {
     "eslint": "eslint",
     "test": "jest",
-    "build": "tsc",
-    "clean": "rm -rf ./test_build/*"
+    "prebuild": "npm t",
+    "build": "tsc"
   },
   "author": "Ben Turner",
   "license": "ISC",

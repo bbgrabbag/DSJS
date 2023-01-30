@@ -1,4 +1,4 @@
-import { GraphNode, Graph, InvalidGraphNodeChildError } from "./";
+import { GraphNode, Graph, InvalidGraphNodeChildError } from ".";
 
 describe("Graph data structure", () => {
   it("Should be able to create nodes", () => {
