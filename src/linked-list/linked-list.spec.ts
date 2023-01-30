@@ -52,5 +52,6 @@ describe('Linked List', () => {
         const ll2 = new LinkedList();
         ll2.append(1);
         expect(ll2.head?.value).toBe(1);
+        expect(ll2.last?.value).toBe(1);
     });
 });

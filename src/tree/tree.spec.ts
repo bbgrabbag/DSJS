@@ -1,4 +1,5 @@
 import { TreeNode, Tree, BinaryTree, BinaryTreeNode, Heap, TrieNode } from ".";
+import { LinkedList } from "../linked-list";
 
 describe("Tree Node", () => {
   it("Should initialize empty", () => {
@@ -62,14 +63,52 @@ describe("Binary Tree", () => {
     expect(node.children.length).toBe(0);
   });
 
-  it('Should calculate height', () => {
+  it("Should calculate height", () => {
     const node = BinaryTree.createNode(1);
     node.insert(BinaryTree.createNode(1), 0);
     node.getChildNode(0)?.insert(BinaryTree.createNode(1), 0);
     node.getChildNode(0)?.getChildNode(0)?.insert(BinaryTree.createNode(1), 0);
-    node.getChildNode(0)?.getChildNode(0)?.getChildNode(0)?.insert(BinaryTree.createNode(1), 0);
+    node
+      .getChildNode(0)
+      ?.getChildNode(0)
+      ?.getChildNode(0)
+      ?.insert(BinaryTree.createNode(1), 0);
     expect(node.height).toBe(5);
+  });
 
+  it("Should generate an array of linked lists of nodes at each depth", () => {
+    const node = BinaryTree.createNode("root");
+    node.insert(BinaryTree.createNode("left child"), 0);
+    node
+      .getChildNode(0)
+      ?.insert(BinaryTree.createNode("left left grandchild"), 0);
+    node
+      .getChildNode(0)
+      ?.insert(BinaryTree.createNode("left right grandchild"), 1);
+
+    node.insert(BinaryTree.createNode("right child"), 1);
+    node
+      .getChildNode(1)
+      ?.insert(BinaryTree.createNode("right left grandchild"), 0);
+    node
+      .getChildNode(1)
+      ?.insert(BinaryTree.createNode("right right grandchild"), 1);
+
+    const nodeList = node.getNodeList();
+    expect(nodeList.length).toBe(3);
+    nodeList.forEach((ll) => expect(ll instanceof LinkedList).toBe(true));
+    expect(nodeList[0].head?.value).toBe(node);
+    expect(nodeList[0].last?.value).toBe(node);
+    expect(nodeList[0].head?.next).toBe(null);
+
+    expect(nodeList[1].head?.value).toBe(node.getChildNode(0));
+    expect(nodeList[1].head?.next?.value).toBe(node.getChildNode(1));
+    expect(nodeList[1].head?.next?.next).toBe(null);
+
+    expect(nodeList[2].head?.value).toBe(node.getChildNode(0)?.getChildNode(0));
+    expect(nodeList[2].head?.next?.value).toBe(node.getChildNode(0)?.getChildNode(1));
+    expect(nodeList[2].head?.next?.next?.value).toBe(node.getChildNode(1)?.getChildNode(0));
+    expect(nodeList[2].head?.next?.next?.next?.value).toBe(node.getChildNode(1)?.getChildNode(1));
   });
 
   it("Should traverse in order", () => {
@@ -84,13 +123,7 @@ describe("Binary Tree", () => {
     node.getChildNode(1)?.insert(BinaryTree.createNode(3), 1);
 
     expect(BinaryTree.inOrderTraversal(node)).toEqual([
-      -1,
-      0,
-      0.5,
-      1,
-      1.5,
-      2,
-      3,
+      -1, 0, 0.5, 1, 1.5, 2, 3,
     ]);
   });
   it("Should traverse pre order", () => {
@@ -104,13 +137,7 @@ describe("Binary Tree", () => {
     node.getChildNode(1)?.insert(BinaryTree.createNode(3), 1);
 
     expect(BinaryTree.preOrderTraversal(node)).toEqual([
-      1,
-      0,
-      -1,
-      0.5,
-      2,
-      1.5,
-      3,
+      1, 0, -1, 0.5, 2, 1.5, 3,
     ]);
   });
 
@@ -126,13 +153,7 @@ describe("Binary Tree", () => {
     node.getChildNode(1)?.insert(BinaryTree.createNode(3), 1);
 
     expect(BinaryTree.postOrderTraversal(node)).toEqual([
-      3,
-      2,
-      1.5,
-      1,
-      0.5,
-      0,
-      -1,
+      3, 2, 1.5, 1, 0.5, 0, -1,
     ]);
   });
 });
@@ -244,13 +265,12 @@ describe("Trie Node", () => {
     nodeA.insert(nodeD, 1);
     nodeB.insert(nodeE, 1);
 
-    expect(nodeA.getNodeWithPrefix('')).toBe(nodeA);
-    expect(nodeA.getNodeWithPrefix('a')).toBeNull();
-    expect(nodeA.getNodeWithPrefix('ABCD')).toBeNull();
-    expect(nodeA.getNodeWithPrefix('AB')).toBe(nodeB);
-    expect(nodeA.getNodeWithPrefix('ABC')).toBe(nodeC);
-    expect(nodeA.getNodeWithPrefix('AD')).toBe(nodeD);
-    expect(nodeA.getNodeWithPrefix('ABE')).toBe(nodeE);
-
+    expect(nodeA.getNodeWithPrefix("")).toBe(nodeA);
+    expect(nodeA.getNodeWithPrefix("a")).toBeNull();
+    expect(nodeA.getNodeWithPrefix("ABCD")).toBeNull();
+    expect(nodeA.getNodeWithPrefix("AB")).toBe(nodeB);
+    expect(nodeA.getNodeWithPrefix("ABC")).toBe(nodeC);
+    expect(nodeA.getNodeWithPrefix("AD")).toBe(nodeD);
+    expect(nodeA.getNodeWithPrefix("ABE")).toBe(nodeE);
   });
 });

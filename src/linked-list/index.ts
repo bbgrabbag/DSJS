@@ -1,63 +1,53 @@
-export class LinkedListNode<D>{
-    value: D;
-    next: LinkedListNode<D> | null = null;
+export class LinkedListNode<D> {
+  value: D;
+  next: LinkedListNode<D> | null = null;
 
-    constructor(value: D) {
-        this.value = value;
-    }
-
+  constructor(value: D) {
+    this.value = value;
+  }
 }
 
-export class LinkedList<D>{
+export class LinkedList<D> {
+  head: LinkedListNode<D> | null = null;
+  last: LinkedListNode<D> | null = null;
 
-    protected _head: LinkedListNode<D> | null = null;
-    protected _last: LinkedListNode<D> | null = null;
-
-    constructor(initializer?: D) {
-        if (initializer !== undefined) {
-            this._head = new LinkedListNode<D>(initializer);
-            this._last = this._head;
-        }
+  constructor(initializer?: D) {
+    if (initializer !== undefined) {
+      this.head = new LinkedListNode<D>(initializer);
+      this.last = this.head;
     }
+  }
 
-    get head(): LinkedListNode<D> | null {
-        return Object.freeze(this._head);
-    }
+  append(value: D): LinkedListNode<D> {
+    const node = new LinkedListNode(value);
+    if (this.head === null) this.head = node;
+    if (this.last === null) return (this.last = node);
+    this.last.next = node;
+    this.last = node;
+    return node;
+  }
 
-    get last(): LinkedListNode<D> | null {
-        return Object.freeze(this._last);
-    }
+  prepend(value: D): LinkedListNode<D> {
+    const next = this.head;
+    const node = new LinkedListNode(value);
+    node.next = next;
+    return (this.head = node);
+  }
 
-    append(value: D): LinkedListNode<D> {
-        const node = new LinkedListNode(value);
-        if (this.head === null) this._head = node;
-        node.next = this.last;
-        this._last = node;
-        return node;
-    }
+  static createNode<D>(value: D): LinkedListNode<D> {
+    return new LinkedListNode<D>(value);
+  }
 
-    prepend(value: D): LinkedListNode<D> {
-        const next = this.head;
-        const node = new LinkedListNode(value);
-        node.next = next;
-        return this._head = node;
-    }
+  static insert<D>(value: D, node: LinkedListNode<D>): LinkedListNode<D> {
+    const next = node.next;
+    node.next = this.createNode<D>(value);
+    node.next.next = next;
+    return node;
+  }
 
-    static createNode<D>(value: D): LinkedListNode<D> {
-        return new LinkedListNode<D>(value);
-    }
-
-    static insert<D>(value: D, node: LinkedListNode<D>): LinkedListNode<D> {
-        const next = node.next;
-        node.next = this.createNode<D>(value);
-        node.next.next = next;
-        return node;
-    }
-
-    static prepend<D>(value: D, node: LinkedListNode<D>): LinkedListNode<D> {
-        const next = this.createNode<D>(value);
-        next.next = node;
-        return next;
-    }
-
+  static prepend<D>(value: D, node: LinkedListNode<D>): LinkedListNode<D> {
+    const next = this.createNode<D>(value);
+    next.next = node;
+    return next;
+  }
 }

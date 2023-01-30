@@ -1,3 +1,6 @@
+import { LinkedList } from "../linked-list";
+import { Queue } from "../queue";
+
 export class TreeNode<D> {
   protected _value: D;
   protected _size: number;
@@ -91,6 +94,25 @@ export class BinaryTreeNode<D> extends TreeNode<D> {
 
   getChildNode(index: 0 | 1): BinaryTreeNode<D> | null {
     return this._children[index] || null;
+  }
+
+  getNodeList(): Array<LinkedList<BinaryTreeNode<D>>> {
+    const nodeList: Array<LinkedList<BinaryTreeNode<D>>> = [];
+
+    const queue = new Queue<BinaryTreeNode<D>[]>();
+    queue.enqueue([this]);
+    while (queue.length) {
+      const nodes = queue.dequeue();
+      const ll = new LinkedList<BinaryTreeNode<D>>();
+      const children: BinaryTreeNode<D>[] = [];
+      nodes.forEach((node) => {
+        ll.append(node);
+        children.push(...node.children);
+      });
+      nodeList.push(ll);
+      if (children.length) queue.enqueue(children);
+    }
+    return nodeList;
   }
 
   remove(index: 0 | 1): void {
