@@ -63,8 +63,26 @@ export class Tree {
 }
 
 export class BinaryTreeNode<D> extends TreeNode<D> {
+  protected _children: BinaryTreeNode<D>[] = [];
   constructor(value: D) {
     super(value, 2);
+  }
+
+  get children(): Readonly<Array<BinaryTreeNode<D>>> {
+    return Object.freeze(this._children);
+  }
+
+  get height(): number {
+    const search = (node: BinaryTreeNode<D>, levels = 1): number => {
+      const [left, right] = node.children;
+      if (left && right)
+        return Math.max(search(left, levels + 1), search(right, levels + 1));
+      if (left) return search(left, levels + 1);
+      if (right) return search(right, levels + 1);
+      return levels;
+    };
+
+    return search(this);
   }
 
   insert(node: BinaryTreeNode<D>, index: 0 | 1): void {

@@ -62,6 +62,16 @@ describe("Binary Tree", () => {
     expect(node.children.length).toBe(0);
   });
 
+  it('Should calculate height', () => {
+    const node = BinaryTree.createNode(1);
+    node.insert(BinaryTree.createNode(1), 0);
+    node.getChildNode(0)?.insert(BinaryTree.createNode(1), 0);
+    node.getChildNode(0)?.getChildNode(0)?.insert(BinaryTree.createNode(1), 0);
+    node.getChildNode(0)?.getChildNode(0)?.getChildNode(0)?.insert(BinaryTree.createNode(1), 0);
+    expect(node.height).toBe(5);
+
+  });
+
   it("Should traverse in order", () => {
     const node = BinaryTree.createNode(1);
     node.insert(BinaryTree.createNode(0), 0);
